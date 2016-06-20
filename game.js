@@ -18,6 +18,9 @@ window.onload = function () {
         array = ["crystal.png", "greencrystal.png", "bluecrystal.png", "orangecrystal.png", "redcrystal.png"],
         lastselected,
         selectedid,
+        loadimages,
+        loadImage,
+        ImagePreloaderCall,
         shufflearray = [];
 	  
     function getMousePos(e) {
@@ -326,19 +329,36 @@ window.onload = function () {
 
     }
     
-    function loadhandler(count, array) {
-        count = count + 1;
-        if (count === array.length) {game(); }
+    function ImagePreloader(array) {
+        
+        function LoadImage(url, index) {
+            
+            var img = new Image();
+            img.onload = function () {
+                count = count + 1;
+                if (count === array.length) {game(); }
+            };
+            img.onerror = function () {};
+            img.src = url;
+           
+        }
+
+        function LoadImages(array) {
+           
+            var index;
+            for (index = 0; index < array.length; index = index + 1) {
+                loadImage = new LoadImage(array[index], index);
+            }
+           
+        }
+        loadimages = new LoadImages(array);
+        
     }
-   
+
     array = array.reverse().filter(function (e, i, array) {
         return array.indexOf(e, i + 1) === -1;
     }).reverse();
-
-    for (index = 0; index < array.length; index = index + 1) {
-        imageObj = new Image();
-        imageObj.onload = loadhandler;
-        imageObj.src = array[index];
-    }
+    
+    ImagePreloaderCall = new ImagePreloader(array);
     
 };

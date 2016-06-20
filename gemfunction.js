@@ -1,13 +1,59 @@
+
+
+
 window.onload = function () {
-   
-   var count=0;
+    
+    previous = undefined;
+	function pagereloader() {        
+	  var xhttp = new XMLHttpRequest();
+	  xhttp.onreadystatechange = function() {
+		if (xhttp.readyState == 4 && xhttp.status == 200) {
+			current = escape(xhttp.responseText.toString());
+			if(previous){
+				if(previous!==current){location.reload();}
+			}
+			previous=current;
+		}
+	  };
+	  xhttp.open("GET", window.location.href, true);
+	  xhttp.send();
+
+	} 
+	setInterval(pagereloader, 1000);
+    
+    function writeMessage(canvas, message) {
+        var context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.font = '10pt Calibri';
+        context.fillStyle = 'black';
+        context.fillText(message, 10, 25);
+      }
+    
+      function getMousePos(canvas, evt) {
+        var rect = canvas.getBoundingClientRect();
+        return {
+          x: evt.clientX - rect.left,
+          y: evt.clientY - rect.top
+        };
+      }
+    
+      var canvas = document.getElementById('myCanvas');
+      var context = canvas.getContext('2d');
+
+      canvas.addEventListener('mousemove', function(evt) {
+        var mousePos = getMousePos(canvas, evt);
+        message = 'Mouse position: ' + mousePos.x + ',' + mousePos.y;
+        writeMessage(canvas, message);
+      }, false);
+    
+   var count = 0;
    function ImagePreloader(array) {
         
         function LoadImage(url, index) {
-         
+            
                 var img = new Image();
                 img.onload = function () {
-                   count=count+1;
+                   count = count + 1;
                      if(count === array.length){game();}
                 };
                 img.onerror = function () {
@@ -71,15 +117,94 @@ window.onload = function () {
           
             var images = document.getElementsByTagName("img"),
                 rootimage = images[temp].src,
-                i = "";
-                linkarray = [temp > 30,images[temp - 10].src === rootimage && images[temp - 20].src === rootimage && images[temp - 30].src === rootimage,temp,images,undefined,undefined,undefined,undefined,undefined,undefined,-10,0,temp > 10,images[temp - 10].src === rootimage && images[temp - 20].src === rootimage,temp,images,undefined,undefined,undefined,undefined,undefined,undefined,-10,0,temp < 70,images[temp + 10].src === rootimage && images[temp + 20].src === rootimage && images[temp + 30].src === rootimage,temp,images,undefined,undefined,undefined,undefined,undefined,undefined,-40,30,temp < 80,images[temp + 10].src === rootimage && images[temp + 20].src === rootimage,temp,images,undefined,undefined,undefined,undefined,undefined,undefined,-30,20,temp < 80,images[temp + 10].src === rootimage && images[temp + 20].src === rootimage,temp,images,undefined,undefined,undefined,undefined,undefined,undefined,-30,20,temp > 10 && temp < 90,images[temp - 10].src === rootimage && images[temp + 10].src === rootimage,temp,images,undefined,undefined,undefined,undefined,undefined,undefined,-30,10,temp.toString().slice(-1).indexOf(7) === -1 && temp.toString().slice(-1).indexOf(8) === -1 && temp.toString().slice(-1).indexOf(9) === -1,images[temp + 1].src === rootimage && images[temp + 2].src === rootimage && images[temp + 3].src === rootimage,temp,images,1,2,-11,-12,3,-13,-10,0,temp.toString().slice(-1).indexOf(8) === -1 && temp.toString().slice(-1).indexOf(9) === -1,images[temp + 1].src === rootimage && images[temp + 2].src === rootimage,temp,images,1,2,-11,-12,undefined,undefined,-10,0,temp.toString().slice(-1).indexOf(2) === -1 && temp.toString().slice(-1).indexOf(1) === -1 && temp.toString().slice(-1).indexOf(0) === -1,images[temp - 1].src === rootimage && images[temp - 2].src === rootimage && images[temp - 3].src === rootimage,temp,images,-1,-2,-11,-12,-3,-13,-10,0,temp.toString().slice(-1).indexOf(1) === -1 && temp.toString().slice(-1).indexOf(0) === -1,images[temp - 1].src === rootimage && images[temp - 2].src === rootimage,temp,images,-1,-2,-11,-12,undefined,undefined,-10,0,temp.toString().slice(-1).indexOf(8) === -1 && temp.toString().slice(-1).indexOf(9) === -1,images[temp - 1].src === rootimage && images[temp + 1].src === rootimage,temp,images,-1,1,-11,11,undefined,undefined,-10,0];
+                i = "",
+                array = [
+                    {
+                        "firstif": "temp > 30",
+                        "secondif": "images[temp - 10].src === rootimage && images[temp - 20].src === rootimage && images[temp - 30].src === rootimage",
+                        "g": 40, "h": 0, "score": 100
+                    },
+                    {
+                        "firstif": "temp > 20",
+                        "secondif": "images[temp - 10].src === rootimage && images[temp - 20].src === rootimage",
+                        "g": 30, "h": 0, "score": 100
+                    },
+                    {
+                        "firstif": "temp < 70",
+                        "secondif": "images[temp + 10].src === rootimage && images[temp + 20].src === rootimage && images[temp + 30].src === rootimage",
+                        "g": 40, "h": 30, "score": 100
+                    },
+                     {
+                        "firstif": "temp < 80",
+                        "secondif": "images[temp + 10].src === rootimage && images[temp + 20].src === rootimage",
+                        "g": 30, "h": 20, "score": 100
+                    },
+                    {
+                        "firstif": "temp > 10 && temp < 90",
+                        "secondif": "images[temp - 10].src === rootimage && images[temp + 10].src === rootimage",
+                        "g": 30, "h": 10, "score": 100
+                    },
+                    {
+                        "firstif": "temp.toString().slice(-1).indexOf(7) === -1 && temp.toString().slice(-1).indexOf(8) === -1 && temp.toString().slice(-1).indexOf(9) === -1",
+                        "secondif": "images[temp + 1].src === rootimage && images[temp + 2].src === rootimage && images[temp + 3].src === rootimage",
+                        "a": 1, "b": 2, "c": 11, "d": 12, "e": 3, "f": 12, "g": 10, "h": 0, "score": 100
+                    },
+                    {
+                        "firstif": "temp.toString().slice(-1).indexOf(8) === -1 && temp.toString().slice(-1).indexOf(9) === -1",
+                        "secondif": "images[temp + 1].src === rootimage && images[temp + 2].src === rootimage",
+                        "a": 1,"b": 2,"c": 11,"d": 12,"g": 10,"h": 0,"score": 100
+                    },
+                    {
+                        "firstif": "temp.toString().slice(-1).indexOf(2) === -1 && temp.toString().slice(-1).indexOf(1) === -1 && temp.toString().slice(-1).indexOf(0) === -1",
+                        "secondif": "images[temp - 1].src === rootimage && images[temp - 2].src === rootimage && images[temp - 3].src === rootimage",
+                        "a": -1,"b": -2,"c": 11,"d": 12,"e": -3,"f": 13,"g": 10,"h": 0,"score": 100
+                    },
+                    {
+                        "firstif": "temp.toString().slice(-1).indexOf(1) === -1 && temp.toString().slice(-1).indexOf(0) === -1",
+                        "secondif": "images[temp - 1].src === rootimage && images[temp - 2].src === rootimage",
+                        "a": -1, "b": -2, "c": 11, "d": 12, "g": 10, "h": 0, "score": 100
+                    },
+                     {
+                        "firstif": "temp.toString().slice(-1).indexOf(9) === -1 && temp.toString().slice(-1).indexOf(0) === -1",
+                        "secondif": "images[temp - 1].src === rootimage && images[temp + 1].src === rootimage",
+                        "a": -1, "b": 1, "c": 11, "d": -11, "g": 10, "h": 0, "score": 100
+                    }
+                    
+                ];
             
-            for (i=0; i<linkarray.length; i=i+12){
-                match=link(linkarray[i],linkarray[i+1],linkarray[i+2],linkarray[i+3],linkarray[i+4],linkarray[i+5],linkarray[i+6],linkarray[i+6],linkarray[i+7],linkarray[i+8],linkarray[i+9],linkarray[i+10],linkarray[i+11]);
-            }
-           
+            for(i=0; i<array.length; i=i+1){
+               a=array[i];
+	           match = link(a.firstif,a.secondif,temp,images,a.a,a.b,a.c,a.d,a.e,a.f,a.g,a.h,match,rootimage,a.score);
+            }         
             
             return match;
+        }
+        
+        function link(firstif,secondif,temp,images,a,b,c,d,e,f,g,h,match,rootimage,score){
+            firstif = window.eval.call(window,'(function (images,temp,rootimage) {return '+firstif+';})')(images,temp,rootimage);
+            if (Boolean(firstif)) {
+                secondif = window.eval.call(window,'(function (images,temp,rootimage) {return '+secondif+';})')(images,temp,rootimage);
+                if (Boolean(secondif)) {
+                    match = true;
+                    document.getElementById("score").innerHTML = parseInt(document.getElementById("score").innerHTML, 10)+score;
+                    for (i = temp + h; i > 0; i = i - 10) {
+                        if (i > g) {
+                            images[i].src = images[i - g].src;
+                            if(a){images[i + a].src = images[i - c].src;}
+                            if(b){images[i + b].src = images[i - d].src;}
+                            if(e){images[i + e].src = images[i - f].src;}
+                        } else {
+                            images[i].src = shuffle(array)[0];
+                            if(a){images[i + a].src = shuffle(array)[0];}
+                            if(b){images[i + b].src = shuffle(array)[0];}
+                            if(e){images[i + e].src = shuffle(array)[0];}
+                        }
+                    }
+                }
+            }
+            
+            return match;
+            
         }
 
         function myFunction(selectedsrc, selectedid) {
@@ -129,44 +254,14 @@ window.onload = function () {
 
             
         }
-        
-        function link(firstif,secondif,temp,images,a,b,c,d,e,f,g,h){
-            if (firstif) {
-                if (secondif) {
-                    match = true;
-                    document.getElementById("score").innerHTML = parseInt(document.getElementById("score").innerHTML, 10)+100;
-                    for (i = temp + h; i > 0; i = i - 10) {
-                        if (i > g*-1) {
-                            images[i].src = images[i + g].src;
-                            if(a){
-                                images[i + a].src = images[i + c].src;
-                            }
-                            if(b){
-                                images[i + b].src = images[i + d].src;
-                            }
-                            if(e){
-                                 images[i + e].src = images[i - f].src;
-                            }
-                        } else {
-                            images[i].src = shuffle(array)[0];
-                            if(a){
-                                images[i + a].src = shuffle(array)[0];
-                            }
-                            if(b){
-                                images[i + b].src = shuffle(array)[0];
-                            }
-                            if(e){
-                                images[i + e].src = shuffle(array)[0];
-                            }
-                        }
-                    }
-                }
-            }
-            
-        }
 
         function tableCreate() {
-           
+            var c = document.getElementById("myCanvas");
+            var ctx = c.getContext("2d");
+            var img = new Image();
+            img.src = "crystal.png";
+            
+            ctx.drawImage(img, 10, 10);
             var gamecontainer = document.getElementById('gamecontainer'),
                 tbl = document.createElement('table'),
                 tbdy = document.createElement('tbody'),
@@ -218,7 +313,7 @@ window.onload = function () {
 
             for (i = 0; i < document.getElementsByTagName("img").length; i = i + 1) {
                 document.getElementsByTagName("img")[i].addEventListener('click', function () {
-                    myFunction(this.src, this.id);
+                    myFunction(this.src, this.id); 
                 }, false);
             }
         })();
